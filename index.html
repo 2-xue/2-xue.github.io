@@ -5,36 +5,375 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hello 2xue</title>
     <style>
-        body {
-            font-family: system-ui, sans-serif;
+        /* 全局基础样式 */
+        * {
             margin: 0;
-            padding: 1rem;
-            background-color: #acacac;  /* 浅灰色背景 */
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f0f2f5;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-
-            background-image: url('ea_background.png');
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);  /* 轻微阴影 */
+            font-family: system-ui, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            padding: 15px;
+            position: relative;
         }
+
+        /* 演示卡片容器 */
+        .demo-container {
+            width: 100%;
+            background: #ffffff;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+            padding: 13px 13px;
+            transition: all 0.2s;
+        }
+
+        /* 最外层容器 */
+        .outer-box {
+            border: 5px solid #000000;
+            padding: 5px;
+            background-color: #ffffff;
+            border-radius: 3px;
+            transition: box-shadow 0.2s;
+        }
+
+        /* inner-box Flexbox 布局 */
+        .inner-box {
+            border: 5px solid #000000;
+            background-color: #fefefe;
+            border-radius: 3px;
+            display: flex;
+            flex-direction: column;
+            min-height: 500px;
+        }
+
+        /* 内容区域 */
+        .content-area {
+            flex: 1;
+            padding: 24px 20px;
+        }
+
+        /* 内容文本样式 */
+        .inner-content {
+            line-height: 45px;
+            font-size: 1.3rem;
+            font-weight: 500;
+            position: relative;
+            top: 10px;
+        }
+        
         h1 {
             color: #333;
         }
         p {
             color: #555;
         }
+        
+        /* 图片容器 */
+        .image-corner {
+            display: flex;
+            justify-content: flex-end;
+            padding: 0 20px 20px 0;
+        }
+        
+        /* 图片样式 - 添加交互光标 */
+        .corner-img {
+            width: 200px;
+            height: auto;
+            display: block;
+            border-radius: 8px;
+            box-shadow: 0 1px 8px #333;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;  /* 鼠标变成手型，提示可点击 */
+        }
+        
+        .corner-img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 1px 24px #000000;
+        }
+        
+       
+        /* 悬停提示框样式 */
+        .hover-tooltip {
+            display: none;
+            position: fixed;
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+            border-radius: 1px;
+            padding: 3px 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            max-width: 280px; /* 最大宽度280px，超出则换行 */
+            min-width: 105px;
+            pointer-events: none;
+            animation: fadeInUp 0.2s ease;
+            border: 1px solid #860000;
+            
+
+        }
+        
+        .hover-tooltip::before {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 80px;
+            width: 6px;
+            height: 6px;
+            background: #ffffff;
+            transform: rotate(45deg);
+            border-right: 1px solid #860000;
+            border-bottom: 1px solid #860000;
+        }
+        
+        .hover-tooltip p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #000000;
+            text-align: center;
+            font-weight: 250;
+            display: block;
+            width: 100%;
+        }
+        /* 动画效果 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes fadeOutDown {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+        }     
+        /* 抖动动画 - 不规则上下左右移动 */
+        @keyframes shake {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            10% { transform: translate(-2px, -1px) rotate(-0.5deg); }
+            20% { transform: translate(2px, -2px) rotate(0.5deg); }
+            30% { transform: translate(-1px, 2px) rotate(-0.3deg); }
+            40% { transform: translate(2px, 1px) rotate(0.3deg); }
+            50% { transform: translate(-2px, -2px) rotate(-0.5deg); }
+            60% { transform: translate(1px, 2px) rotate(0.4deg); }
+            70% { transform: translate(-1px, -1px) rotate(-0.2deg); }
+            80% { transform: translate(2px, -1px) rotate(0.3deg); }
+            90% { transform: translate(-2px, 1px) rotate(-0.4deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        /* 应用到需要抖动的元素 */
+        .shaking-text {
+            display: inline-block;
+            animation: shake 0.3s infinite ease-in-out;
+        }
+       
+        /* 脉冲动画 - 持续循环 */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            75% { transform: scale(1.7); opacity: 0.8; }
+            50% { transform: scale(1.08); opacity: 0.9; }
+            25% { transform: scale(0.5); opacity: 0.8; }
+        }
+        
+        /* 脸红动画 - 持续循环 */
+        @keyframes blush {
+            0%, 100% {color: #000000; text-shadow: 0 0 4px #c10000; }
+        }
+        
+        /* 心跳动画 - 持续循环 */
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.3); }
+            50% { transform: scale(0.95); }
+            75% { transform: scale(1.05); }
+        }
+        
+        /* 动画类 - 都为 infinite 持续播放 */
+      
+        .animate-pulse {
+            display: inline-block;
+            animation: pulse 0.3s ease-in-out infinite;
+        }
+        .animate-blush {
+            display: inline-block;
+            animation: blush 0.6s ease-in-out infinite;
+        }
+        .animate-heartBeat {
+            display: inline-block;
+            animation: heartBeat 0.6s ease-in-out infinite;
+        }
+        .animate-shake {
+            display: inline-block;
+            animation: shake 0.3s ease-in-out infinite;
+        }
+ 
     </style>
 </head>
 <body>
-    <div style="position: relative; left: -120px; top: -50px;">
-        <h1>你好,我是2xue</h1>
-        <p>这里是我的后院，正在建设中</p>
-        <p>技术博客 · 艺术实验 · 我的生命</p>
-        <p><3</p>
+<div class="demo-container">
+    <div class="outer-box">
+        <div class="inner-box">
+            <div class="content-area">
+                <div class="inner-content">
+                    <h1>Hello 2xue</h1><br>
+                    <p style="color: #860000;font-size: 14px;">这里是我的后院，正在建设中 。。。</p>
+                    <p>技术博客——艺术实验——我的生命——你的生命</p>
+                    <p>互联网</p>
+                    <p style="color: #c10000;" class="animate-heartBeat">&lt;3</p>
+                </div>
+            </div>
+            <div class="image-corner">
+                <img class="corner-img" src="ea-1.png" alt="装饰图片" id="clickableImage">
+            </div>
+        </div>
     </div>
+</div>
+ 
+
+<!-- 悬停提示框（浮动对话框） -->
+<div id="hoverTooltip" class="hover-tooltip">
+    <p></p>
+</div>
+
+<script>
+    // 参数
+    const image = document.getElementById('clickableImage');
+    const hoverTooltip = document.getElementById('hoverTooltip');
+    const tooltipText = hoverTooltip.querySelector('p');
+    
+    // ========= 对话文字=========
+    const messageList = [
+        { text: "你摸了我的小脸吗~"},
+        { text: "喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？喜欢我吗？", animation: "shake" },
+        { text: "事实就是在互联网上卖萌比现实里简单一百倍呀^^", animation: "blush" },
+        { text: "我知道我看起来像是个无聊怪异的痴女......然而如今人人都知道痴女是萌点。", animation: "blush" },
+        { text: "I LOVE U!!!", animation: "shake" },
+        { text: "I LOVE INTERNET!!!", animation: "pulse" },
+        { text: "iam cute." },
+        { text: "everything is romantic.", animation: "blush" },
+        { text: "♡", animation: "blush" },
+        { text: "patting my head pretending that our relationship is that good......." },
+        { text: "jessica." }
+        
+    ];
+
+    // 随机获取一条消息和对应的动画
+    function getRandomMessageWithAnimation() {
+        const randomIndex = Math.floor(Math.random() * messageList.length);
+        return messageList[randomIndex];
+    }
+    
+    // 移除所有动画类
+    function removeAllAnimations() {
+        tooltipText.classList.remove(
+            'animate-bounce', 'animate-wiggle', 'animate-pulse',
+            'animate-glow', 'animate-blush', 'animate-heartBeat',
+            'animate-shake'
+        );
+    }
+    
+    // 应用动画（持续播放，不需要移除后重新添加）
+    function applyAnimation(animationName) {
+        // 直接添加对应的动画类，CSS中已设置 infinite
+        switch(animationName) {
+            case 'bounce':
+                tooltipText.classList.add('animate-bounce');
+                break;
+            case 'wiggle':
+                tooltipText.classList.add('animate-wiggle');
+                break;
+            case 'pulse':
+                tooltipText.classList.add('animate-pulse');
+                break;
+            case 'glow':
+                tooltipText.classList.add('animate-glow');
+                break;
+            case 'blush':
+                tooltipText.classList.add('animate-blush');
+                break;
+            case 'heartBeat':
+                tooltipText.classList.add('animate-heartBeat');
+                break;
+            case 'shake':
+                tooltipText.classList.add('animate-shake');
+                break;
+            default:
+                break;
+        }
+    }
+
+    // 定时器变量，用于延迟隐藏悬停提示
+    let hoverTimeout;
+   
+    
+    // ========== 悬停事件：显示浮动对话框 ==========
+    image.addEventListener('mouseenter', function(e) {
+    
+        if (hoverTimeout) {
+            clearTimeout(hoverTimeout);
+        }
+        
+        // 获取随机消息和动画
+        const messageObj = getRandomMessageWithAnimation();
+        
+        // 更新文字内容
+        tooltipText.textContent = messageObj.text;
+        
+        // 移除旧动画，添加新动画
+        removeAllAnimations();
+        applyAnimation(messageObj.animation);
+
+        // 获取鼠标位置来定位提示框
+        const mouseX = e.clientX;
+        const mouseY = e.clientY;
+        
+        // 显示提示框
+        hoverTooltip.style.display = 'block';
+        
+        // 定位提示框
+        hoverTooltip.style.left = (mouseX - 150) + 'px';
+        hoverTooltip.style.top = (mouseY - 80) + 'px';
+        
+    });
+    
+    // 鼠标在图片上移动时，更新提示框位置,让提示框跟随鼠标
+    image.addEventListener('mousemove', function(e) {
+        if (hoverTooltip.style.display === 'block') {
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+            hoverTooltip.style.left = (mouseX - 150) + 'px';
+            hoverTooltip.style.top = (mouseY - 80) + 'px';
+        }
+    });
+    
+    // 鼠标离开图片时，添加淡出动画后隐藏
+    image.addEventListener('mouseleave', function() {
+        // 移除动画类
+        removeAllAnimations();
+        
+        // 添加淡出类
+        hoverTooltip.style.animation = 'fadeOutDown 0.2s ease ';
+        
+        // 延迟后隐藏并重置动画
+        hoverTimeout = setTimeout(() => {
+            hoverTooltip.style.display = 'none';
+            hoverTooltip.style.animation = 'fadeInUp 0.2s ease'; // 恢复淡入动画
+        }, 200);
+    });
+    
+    console.log('页面已加载');
+</script>
 </body>
 </html>
